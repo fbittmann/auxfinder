@@ -1,5 +1,5 @@
+*! version 1.0  16jan2026  Felix Bittmann
 program define auxfinder, rclass
-	*! version 1.0  16jan2026  Felix Bittmann
 	syntax varlist(fv min=1) [if] [in], ///
 	TESTvars(varlist fv min=1) ///
 	[CORRValue(real 0.30)] ///
