@@ -1,4 +1,4 @@
-*! version 1.0  16jan2026  Felix Bittmann
+*! version 1.0.1  19jan2026  Felix Bittmann
 program define auxfinder, rclass
 	syntax varlist(fv min=1) [if] [in], ///
 	TESTvars(varlist fv min=1) ///
@@ -29,8 +29,7 @@ program define auxfinder, rclass
 	
 	local maxmiss = 1 + `maxmiss'		//Convert to multiplierfactor
 	local targets `varlist'
-	tempfile origdata
-	qui save `origdata'
+	preserve
 	
 	marksample touse, novarlist		//IF+IN selection
 	qui keep if `touse'
@@ -523,13 +522,13 @@ program define auxfinder, rclass
 		if "`skiplasso'" == "" {
 			qui gen symbol_miss = ""
 			qui replace symbol_miss = "*" if selected_missing == 1
-			qui replace symbol_miss = "†" if selected_missing == -9
+			qui replace symbol_miss = "ø" if selected_missing == -9
 			qui egen a_1 = concat(a symbol_miss) if a != "."
 			qui replace a_1 = "." if a == "."
 			
 			qui gen symbol_value = ""
 			qui replace symbol_value = "*" if selected_value == 1
-			qui replace symbol_value = "†" if selected_value == -9
+			qui replace symbol_value = "ø" if selected_value == -9
 			qui egen b_1 = concat(b symbol_value) if b != "."
 			qui replace b_1 = "." if b == "."
 			order targetvar testvar catvar a_1 b_1 infogain
@@ -537,17 +536,22 @@ program define auxfinder, rclass
 			rename b_1 corr_value
 			list targetvar testvar nvalid catvar corr_miss corr_value infogain ///
 				, noobs sepby(targetvar) abbrev(16)
-			di as result "    * Selected by `lmodel' 	† `lmodel' failed	"
+			di as result "    * Selected by `lmodel' 	ø `lmodel' failed	"
 		}
 		else {	
+			rename corr_miss_numerical corr_miss
+			rename corr_value_numerical corr_value
 			order targetvar testvar catvar corr_miss corr_value infogain
 			list targetvar testvar nvalid catvar corr* infogain ///
 				, noobs sepby(targetvar) abbrev(16)
 			di as result "    Lasso selection not computed"
+			rename corr_miss corr_miss_numerical 
+			rename corr_value corr_value_numerical 
 		}
 
 
 	*** Macros ***
+	tempfile t_aux
 	gen squared = substr(testvar,-2,.) == "²"
 	
 	local strong_cont
@@ -557,13 +561,13 @@ program define auxfinder, rclass
 	qui count if take == 1
 	local n = r(N)
 	if `n' > 0 {
-		preserve
+		qui save `t_aux', replace
 		qui keep if take == 1
 		forvalues i = 1/`n' {
 			local res = testvar[`i']
 			local strong_cont `strong_cont' `res'
 		}
-	restore	
+		use `t_aux', clear	
 	}
 	
 	
@@ -574,13 +578,13 @@ program define auxfinder, rclass
 	qui count if take == 1
 	local n = r(N)
 	if `n' > 0 {
-		preserve
+		qui save `t_aux', replace
 		qui keep if take == 1
 		forvalues i = 1/`n' {
 			local res = testvar[`i']
 			local strong_cat `strong_cat' `res'
 		}
-	restore
+		use `t_aux', clear
 	}
 	
 	
@@ -591,14 +595,14 @@ program define auxfinder, rclass
 	qui count if take == 1
 	local n = r(N)
 	if `n' > 0 {
-		preserve
+		qui save `t_aux', replace
 		qui keep if take == 1
 		forvalues i = 1/`n' {
 			local res = testvar[`i']
 			local res = subinstr("`res'", "²", "",1)
 			local strong_squared `strong_squared' substr(`res'
 		}
-	restore
+		use `t_aux', clear
 	}
 	
 	local strong_cont : list uniq strong_cont
@@ -627,13 +631,13 @@ program define auxfinder, rclass
 	qui count if take == 1
 	local n = r(N)
 	if `n' > 0 {
-		preserve
+		qui save `t_aux', replace
 		qui keep if take == 1
 		forvalues i = 1/`n' {
 			local res = testvar[`i']
 			local weak_cont `weak_cont' `res'
 		}
-	restore
+		use `t_aux', clear
 	}
 	
 	
@@ -645,13 +649,13 @@ program define auxfinder, rclass
 	qui count if take == 1
 	local n = r(N)
 	if `n' > 0 {
-		preserve
+		qui save `t_aux', replace
 		qui keep if take == 1
 		forvalues i = 1/`n' {
 			local res = testvar[`i']
 			local weak_cat `weak_cat' `res'
 		}
-	restore
+		use `t_aux', clear
 	}
 	
 	
@@ -663,14 +667,14 @@ program define auxfinder, rclass
 	qui count if take == 1
 	local n = r(N)
 	if `n' > 0 {
-		preserve
+		qui save `t_aux', replace
 		qui keep if take == 1
 		forvalues i = 1/`n' {
 			local res = testvar[`i']
 			local res = subinstr("`res'", "²", "",1)
 			local weak_squared `weak_squared' `res'
 		}
-	restore
+		use `t_aux', clear
 	}
 	
 	local weak_cont : list uniq weak_cont
@@ -710,5 +714,5 @@ program define auxfinder, rclass
 	if "`saving'" != "" {
 		save `saving'
 	}
-	qui use `origdata', clear	
+	restore	
 	end
