@@ -3,6 +3,6 @@ d auxfinder: Finding auxiliary variables for imputation models
 d 
 d Author: Felix Bittmannn, Leibniz Institut für Bildungsverläufe, felix.bittmann@lifbi.de
 d
-d Distribution-Date: 20260116
+d Distribution-Date: 20260119
 f auxfinder.ado
 f auxfinder.sthlp
