@@ -165,7 +165,8 @@ lasso / elasticnet models.
 
 {title:References}
 
-{phang}Bittmann, F. (2026). {it:PAPER.} DOI
+{phang}Bittmann, F. (2026). Auxfinder - Finding auxiliary variables for
+imputation models {it:Zenodo.} https://doi.org/10.5281/zenodo.18536805
 
 {title:Author}
 
@@ -174,7 +175,7 @@ lasso / elasticnet models.
 {pstd}Thanks for citing this software as follows:
 
 {pmore}
-Bittmann, F. (2026). {it:auxfinder: Finding auxiliary variables for imputation models.} Available from https://github.com/fbittmann/auxfinder
+Bittmann, F. (2026). {it:auxfinder: Finding auxiliary variables for imputation models.} https://doi.org/10.5281/zenodo.18536805
 
 {title:Also see}
 
