@@ -2,7 +2,7 @@
 Finding auxiliary variables for imputation models
 
 `auxfinder` finds auxiliary variables for imputation models. For details and more examples, see the
-working paper here: XXX
+working paper here: [Zenodo Working Paper](https://doi.org/10.5281/zenodo.18536805)
 
 To install `auxfinder`, type
 
