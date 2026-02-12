@@ -1,4 +1,4 @@
-*! version 1.0.1  19jan2026  Felix Bittmann
+*! version 1.0.2  12feb2026  Felix Bittmann
 program define auxfinder, rclass
 	syntax varlist(fv min=1) [if] [in], ///
 	TESTvars(varlist fv min=1) ///
@@ -13,6 +13,7 @@ program define auxfinder, rclass
 	[SKIPlasso] ///
 	[ELASTICnet] ///
 	[lassoopts(string)] ///
+	[DEScribe] /// 		describe selected variables in detail for easier identification
 	[NONLinear(real -1)]
 	
 	if "`seed'" != "-1" {
@@ -41,8 +42,8 @@ program define auxfinder, rclass
 		if r(N) > 0 {
 			local temp `temp' `VAR'
 		}
-		else {
-			di as result "Removed `VAR' as it only contains missing values"
+		else {			
+			di as result "`VAR' removed from testvars as it only contains missing values"
 		}
 	}
 	local testvars `temp'
@@ -70,6 +71,7 @@ program define auxfinder, rclass
 			local temp `temp' `VAR'
 		}
 		else {
+			local testvars : list testvars - VAR
 			di as result "`VAR' removed from targets because it has no missing values"
 		}
 	}
@@ -89,9 +91,12 @@ program define auxfinder, rclass
 				local res = substr("`VAR'", 3, .)
 				local testvars_cat `testvars_cat' `res'
 			}
-			else {
+			else {					//sort undeclared variables
 				qui levelsof `VAR'
-				if r(r) > `catlimit' {
+				local nlevels = r(r)
+				qui compress `VAR'
+				local vartype : type `VAR'
+				if `nlevels' > `catlimit' | inlist("`vartype'", "float", "double") {
 					local testvars_cont `testvars_cont' `VAR'
 				}
 				else {
@@ -144,7 +149,8 @@ program define auxfinder, rclass
 		post `name' ("`VAR'") (r(N))
 	}
 	postclose `name'	
-	di "Part 1/5 done"	
+	di "Part 1/5 done"
+	*di "`testvars_cat'"
 	
 	************************************************************************
 	*** Prediction of missingness ***
@@ -715,4 +721,9 @@ program define auxfinder, rclass
 		save `saving'
 	}
 	restore	
+		
+	* Describe if specified *
+	if "`describe'" != "" {
+		describe `strong_cont' `strong_cat' `weak_cont' `weak_cat'
+	}
 	end

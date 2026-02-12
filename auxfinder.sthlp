@@ -44,6 +44,8 @@
   {p_end}
 {synopt :{opt nois:ily}}Show more output
   {p_end}
+{synopt :{opt des:cribe}}Describe selected variables in detail
+  {p_end}
   
 {title:Description}
 
@@ -125,6 +127,8 @@ Of course, then the final results are based solely on correlations and case numb
 lasso / elasticnet models.
 
 {phang}{opt noisily} shows more output, of the regression and lassomodels to give users additional insight of what is computed.
+
+{phang}{opt describe} shows details on the selected auxiliary variables for easier identification.
 
 {title:Examples}
 
